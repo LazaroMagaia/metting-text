@@ -334,12 +334,30 @@ stopScreenShareButton.addEventListener("click", () => {
 // Atualizar evento de compartilhamento de tela iniciado por outros participantes
 meeting?.on("screen-share-started", (participant) => {
   console.log(`${participant.displayName} started screen sharing.`);
+
+  // Adicionar o stream de compartilhamento de tela ao container
+  meeting?.getScreenShareStream(participant.id, (screenShareStream) => {
+    const screenShareElement = document.createElement("video");
+    screenShareElement.setAttribute("id", `screen-share-video-${participant.id}`);
+    screenShareElement.srcObject = new MediaStream([screenShareStream.track]);
+    screenShareElement.autoplay = true;
+    screenShareElement.playsInline = true;
+    screenShareElement.style.width = "100%";
+    videoContainer.appendChild(screenShareElement);
+  });
 });
 
 // Atualizar evento de compartilhamento de tela parado por outros participantes
 meeting?.on("screen-share-stopped", (participant) => {
   console.log(`${participant.displayName} stopped screen sharing.`);
+
+  // Remover o elemento de compartilhamento de tela do container
+  const screenShareElement = document.getElementById(`screen-share-video-${participant.id}`);
+  if (screenShareElement) {
+    screenShareElement.remove();
+  }
 });
+
 </script>
 
 
